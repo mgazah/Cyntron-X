@@ -31,3 +31,6 @@ desktop.ini
 # Editor
 .vscode/
 .idea/
+
+# No archives in the repo - source is unpacked at the root
+*.zip

@@ -117,7 +117,7 @@ Cyntron-X/
 - **Revoke the old keys** — they were embedded in earlier copies of this source and are considered public.
 - Rotate any credential that was ever pasted into a chat, commit, or gist.
 - `.env`, `auth/`, session folders and `node_modules/` are git-ignored.
-- `Cyntron-X.zip` is the packaged source snapshot kept at the repo root for one-click deploys.
+- The source is fully unpacked at the repository root — no archive is committed. Use GitHub's **Code → Download ZIP** if you need a packaged copy.
 
 ---
 
