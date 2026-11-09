@@ -747,7 +747,7 @@ const handleMessage = async (sock, msg) => {
 
         // ── Named menu buttons (non-prefixed IDs) ─────────────────────────────
       } else if (buttonId === 'menu_repo') {
-        const repoUrl = config.social?.github || 'https://github.com/Vinpink2/June-Ultra';
+        const repoUrl = config.social?.github || 'https://github.com/mgazah/Cyntron-X';
         await sock.sendMessage(from, {
           text: `💻 *Bot Repository*\n${repoUrl}`
         }, {

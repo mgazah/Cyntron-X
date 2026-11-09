@@ -85,7 +85,7 @@ module.exports = {
           name: 'cta_url',
           buttonParamsJson: JSON.stringify({
             display_text: 'Visit Bot Repo',
-            url: config.social?.github || 'https://github.com/vinpink2/June_X_Ultra'
+            url: config.social?.github || 'https://github.com/mgazah/Cyntron-X'
           })
         }, {
           name: 'cta_url',

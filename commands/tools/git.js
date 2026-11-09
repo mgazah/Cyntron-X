@@ -9,8 +9,8 @@ const config = require("../../config");
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const GITHUB_USER = "Vinpink2";
-const GITHUB_REPO = "June-Ultra";
+const GITHUB_USER = "mgazah";
+const GITHUB_REPO = "Cyntron-X";
 const REPO_URL = "https://github.com/" + GITHUB_USER + "/" + GITHUB_REPO;
 const API_URL = "https://api.github.com/repos/" + GITHUB_USER + "/" + GITHUB_REPO;
 function extractButtonResponseId(v1) {

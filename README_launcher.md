@@ -21,8 +21,8 @@
 
 | Action | Link |
 |--------|------|
-| **Fork Repository** | <a href="https://github.com/Vinpink2/June-Ultra/fork"><img src="https://img.shields.io/badge/Fork Repo%20-24292e?style=for-the-badge&logo=github&logoColor=white&logoSize=auto"/></a> |
-| **Download ZIP** | <a href="https://github.com/Vinpink2/June-Ultra/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/Download%20-2ea043?style=for-the-badge&logo=github&logoColor=white&logoSize=auto"/></a> |
+| **Fork Repository** | <a href="https://github.com/mgazah/Cyntron-X/fork"><img src="https://img.shields.io/badge/Fork Repo%20-24292e?style=for-the-badge&logo=github&logoColor=white&logoSize=auto"/></a> |
+| **Download ZIP** | <a href="https://github.com/mgazah/Cyntron-X/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/Download%20-2ea043?style=for-the-badge&logo=github&logoColor=white&logoSize=auto"/></a> |
 
 </div>
 
@@ -34,7 +34,7 @@
 
 | Platform | Button |
 |----------|--------|
-| **Heroku** | <a href="https://dashboard.heroku.com/new?template=https://github.com/vinpink2/June-Ultra"><img src="https://img.shields.io/badge/HerokuHosting-6762A6?style=for-the-badge&logo=heroku&logoColor=white&logoSize=auto"/></a> |
+| **Heroku** | <a href="https://dashboard.heroku.com/new?template=https://github.com/mgazah/Cyntron-X"><img src="https://img.shields.io/badge/HerokuHosting-6762A6?style=for-the-badge&logo=heroku&logoColor=white&logoSize=auto"/></a> |
 | **Railway** | <a href="https://railway.app/new"><img src="https://img.shields.io/badge/Railway-000000?style=for-the-badge&logo=railway&logoColor=white&logoSize=auto"/></a> |
 | **Render** | <a href="https://render.com"><img src="https://img.shields.io/badge/Render-0099ff?style=for-the-badge&logo=render&logoColor=white&logoSize=auto"/></a> |
 | **CypherXHost** | <a href="https://platform.cypherx.store/register?ref=REPLI2955E16C9A"><img src="https://img.shields.io/badge/CypherXHosting-007BFF?style=for-the-badge&logo=cypherxhost&logoColor=white&logoSize=auto"/></a> |

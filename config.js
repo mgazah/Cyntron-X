@@ -9,7 +9,7 @@ module.exports = {
   newsletterJid: '',
   JUNE_API_URL: 'https://june-ultra-ai-test-model.onrender.com',
   JUNE_BOT_ID: 'june-ultra-main',
-  updateZipUrl: 'https://github.com/Vinpink2/June-X-Ultra/archive/refs/heads/main.zip',
+  updateZipUrl: 'https://github.com/mgazah/Cyntron-X/archive/refs/heads/main.zip',
   packname: '',
   telegramToken: process.env.TELEGRAM_TOKEN || '',
   selfMode: false,
@@ -83,7 +83,7 @@ module.exports = {
   timezone: 'Africa/Nairobi',
   maxWarnings: 3,
   social: {
-    github: 'https://github.com/Vinpink2/June-Ultra',
+    github: 'https://github.com/mgazah/Cyntron-X',
     instagram: 'https://instagram.com/activator_negative',
     youtube: 'http://youtube.com/@suprem_e_lord'
   }

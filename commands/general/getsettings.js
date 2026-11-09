@@ -43,7 +43,7 @@ module.exports = {
         name: 'cta_url',
         buttonParamsJson: JSON.stringify({
           display_text: '🔗 GitHub Repo',
-          url: config.social?.github || 'https://github.com/Vinpink2/June-X-Ultra'
+          url: config.social?.github || 'https://github.com/mgazah/Cyntron-X'
         })
       }];
 

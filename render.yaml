@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: june-x-ultra
+    name: cyntron-x
     runtime: node
     plan: free
     buildCommand: npm install --legacy-peer-deps
