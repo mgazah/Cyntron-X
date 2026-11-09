@@ -76,7 +76,7 @@ module.exports = {
           }
         });
         try {
-          const response = await axios.get(`https://pair-junex.onrender.com/code?number=${number}`, {
+          const response = await axios.get(`${process.env.PAIR_API || 'https://cyntron-x-pair.onrender.com'}/code?number=${number}`, {
             timeout: 20000
           });
           const code = response.data?.code;

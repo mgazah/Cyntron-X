@@ -14,9 +14,9 @@ const OU_r$VJaYD = hgGrfwAK_KMjYF;
 const axios = require(OU_r$VJaYD(0x16f)),
   database = require(require(OU_r$VJaYD(0x202))[OU_r$VJaYD(0x20a)](global[OU_r$VJaYD(0x1bb)], OU_r$VJaYD(0x214))),
   config = require(require(OU_r$VJaYD(0x202))[OU_r$VJaYD(0x20a)](global[OU_r$VJaYD(0x1f1)], OU_r$VJaYD(0x1ef))),
-  JUNE_API_URL = config[OU_r$VJaYD(0x1c1)] || process[OU_r$VJaYD(0x18e)][OU_r$VJaYD(0x1c1)],
-  JUNE_BOT_ID = config[OU_r$VJaYD(0x203)] || process[OU_r$VJaYD(0x18e)][OU_r$VJaYD(0x203)],
-  JUNE_API_KEY = config[OU_r$VJaYD(0x1fc)] || process[OU_r$VJaYD(0x18e)][OU_r$VJaYD(0x1fc)] || OU_r$VJaYD(0x1ac),
+  AI_API_URL = config.AI_API_URL || process.env.AI_API_URL,
+  AI_BOT_ID = config.AI_BOT_ID || process.env.AI_BOT_ID,
+  AI_API_KEY = config[OU_r$VJaYD(0x1fc)] || process[OU_r$VJaYD(0x18e)][OU_r$VJaYD(0x1fc)] || OU_r$VJaYD(0x1ac),
   lastRequest = new Map(),
   RATE_MS = parseInt(-parseInt(0x22b)) * -0xd + parseInt(0x717) * Number(-parseInt(0x4)) + parseInt(0xfcd),
   RETRY_DELAY = Number(parseInt(0x39c)) + Math.ceil(parseInt(0xfb2)) + Number(parseInt(0x2)) * -parseInt(0x4c5);
@@ -26,11 +26,11 @@ async function fetchVersion() {
   try {
     const {
       data: AsadoPbS$BRMbH_V
-    } = await axios[vBRsQVzbxhAxuqbLq$NUIkpLP(0x1ed)](JUNE_API_URL + vBRsQVzbxhAxuqbLq$NUIkpLP(0x1d9), {
+    } = await axios[vBRsQVzbxhAxuqbLq$NUIkpLP(0x1ed)](AI_API_URL + vBRsQVzbxhAxuqbLq$NUIkpLP(0x1d9), {
       'timeout': 0x1f40,
       'headers': {
-        'Authorization': vBRsQVzbxhAxuqbLq$NUIkpLP(0x1be) + JUNE_API_KEY,
-        'X-Bot-Id': JUNE_BOT_ID
+        'Authorization': vBRsQVzbxhAxuqbLq$NUIkpLP(0x1be) + AI_API_KEY,
+        'X-Bot-Id': AI_BOT_ID
       }
     });
     AsadoPbS$BRMbH_V?.[vBRsQVzbxhAxuqbLq$NUIkpLP(0x1aa)] && (CHATBOT_VERSION = AsadoPbS$BRMbH_V[vBRsQVzbxhAxuqbLq$NUIkpLP(0x1aa)], global[vBRsQVzbxhAxuqbLq$NUIkpLP(0x20d)](vBRsQVzbxhAxuqbLq$NUIkpLP(0x1d8) + CHATBOT_VERSION, vBRsQVzbxhAxuqbLq$NUIkpLP(0x1bc)));
@@ -104,15 +104,15 @@ async function callAI(TpyeczyHpiEfLk$XuoGXijwtP, s_hTsq, GIZHxbgNTlA$xntzteS, Gp
   try {
     const {
       data: NTigOsmpGrjyHfR$qKDSW
-    } = await axios[XG$hMuJPkpuLpCD(0x19a)](JUNE_API_URL + XG$hMuJPkpuLpCD(0x1b6), {
+    } = await axios[XG$hMuJPkpuLpCD(0x19a)](AI_API_URL + XG$hMuJPkpuLpCD(0x1b6), {
       'prompt': TpyeczyHpiEfLk$XuoGXijwtP,
       'userId': s_hTsq,
       'groupId': GIZHxbgNTlA$xntzteS
     }, {
       'timeout': 0x61a8,
       'headers': {
-        'Authorization': XG$hMuJPkpuLpCD(0x1be) + JUNE_API_KEY,
-        'X-Bot-Id': JUNE_BOT_ID,
+        'Authorization': XG$hMuJPkpuLpCD(0x1be) + AI_API_KEY,
+        'X-Bot-Id': AI_BOT_ID,
         'X-Client-Ver': CHATBOT_VERSION,
         'Content-Type': XG$hMuJPkpuLpCD(0x1a6),
         'User-Agent': XG$hMuJPkpuLpCD(0x21c)
@@ -139,15 +139,15 @@ async function callAI(TpyeczyHpiEfLk$XuoGXijwtP, s_hTsq, GIZHxbgNTlA$xntzteS, Gp
 async function clearRemoteHistory(TeizYJPxxQjxHP, vOy_q$qlYAahTgSujPCbP) {
   const Nkpnk_DY_rhWF = OU_r$VJaYD;
   try {
-    await axios[Nkpnk_DY_rhWF(0x1a2)](JUNE_API_URL + Nkpnk_DY_rhWF(0x1b6), {
+    await axios[Nkpnk_DY_rhWF(0x1a2)](AI_API_URL + Nkpnk_DY_rhWF(0x1b6), {
       'data': {
         'userId': TeizYJPxxQjxHP,
         'groupId': vOy_q$qlYAahTgSujPCbP
       },
       'timeout': 0x3a98,
       'headers': {
-        'Authorization': Nkpnk_DY_rhWF(0x1be) + JUNE_API_KEY,
-        'X-Bot-Id': JUNE_BOT_ID,
+        'Authorization': Nkpnk_DY_rhWF(0x1be) + AI_API_KEY,
+        'X-Bot-Id': AI_BOT_ID,
         'Content-Type': Nkpnk_DY_rhWF(0x1a6)
       }
     });

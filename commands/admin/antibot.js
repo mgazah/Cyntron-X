@@ -22,7 +22,7 @@ const config = require(require('path').join(global.__ROOT__, 'config'));
 const BOT_PATTERNS = [/\bbot\b/i, /\bai\b/i, /assistant/i, /automat/i, /robot/i, /\bscript\b/i, /spambot/i, /floodbot/i, /chatbot/i, /userbot/i];
 
 // Own bot name is never kicked
-const WHITELIST_PATTERNS = [/junex/i, /june[\s\-_]?x/i, /june[\s\-_]?ultra/i];
+const WHITELIST_PATTERNS = [/cyntron/i, /cyntron[\s\-_]?x/i, /unstoppable/i];
 const isWhitelisted = name => !!name && WHITELIST_PATTERNS.some(p => p.test(name));
 const isBotName = name => !!name && !isWhitelisted(name) && BOT_PATTERNS.some(p => p.test(name));
 

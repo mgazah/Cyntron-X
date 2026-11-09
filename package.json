@@ -1,7 +1,7 @@
 {
   "name": "cyntron-x",
   "version": "2.8.8",
-  "description": "WhatsApp MD-Style Multi-Command Bot by Supreme",
+  "description": "Cyntron-X - WhatsApp MD multi-command bot built on Baileys",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {

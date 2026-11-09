@@ -88,7 +88,7 @@ module.exports = {
       });
 
       // Write to temp file
-      const tempDir = path.join(os.tmpdir(), 'june-x-temp');
+      const tempDir = path.join(os.tmpdir(), 'cyntron-x-temp');
       if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, {
         recursive: true
       });

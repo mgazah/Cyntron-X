@@ -518,7 +518,7 @@ async function v220() {
 function v231() {
   return fs.existsSync(v59);
 }
-const v232 = ["Cyntron-X:~", "cyntron-x:~", "unstoppable:~", "sanezo:~", "suniza:~", "JUNE-MD:~", "Ultra-X:~", "June-Ultra:~", "June::~"];
+const v232 = ["Cyntron-X:~", "cyntron-x:~", "unstoppable:~", "sanezo:~", "suniza:~", "Ultra-X:~"];
 async function v233() {
   const v234 = {
     Lndzl: function (v235, v236) {
@@ -571,7 +571,7 @@ async function v233() {
 async function v250() {
   const v251 = {
     VcUvp: "Ultra-X:~",
-    IsWOL: "June-Ultra:~",
+    IsWOL: "Cyntron-X:~",
     exxaQ: "base64",
     ArvCc: "utf8",
     COTCx: function (v252, v253, v254) {
@@ -584,7 +584,7 @@ async function v250() {
   if (!fs.existsSync(v59) && global.SESSION_ID) {
     const v255 = global.SESSION_ID;
     let v256;
-    const v257 = ["Cyntron-X:~", "cyntron-x:~", "unstoppable:~", "sanezo:~", "suniza:~", "Ultra-X:~", "June-Ultra:~", "JUNE-MD:~", "June::~"];
+    const v257 = ["Cyntron-X:~", "cyntron-x:~", "unstoppable:~", "sanezo:~", "suniza:~", "Ultra-X:~"];
     const v258 = v257.find(v259 => v255.startsWith(v259));
     if (!v258) {
       throw new Error("Unknown session Format: " + v257.join(", "));
@@ -952,7 +952,7 @@ async function v387(v388) {
     const v397 = config.prefix === "" ? "none" : config.prefix || ".";
     const v398 = v383();
     const v399 = Array.isArray(config.ownerName) ? config.ownerName[0] : config.ownerName;
-    const v400 = v31("┏━━━━━━✧ CONNECTED ✧━━━━━━━\n┃✧ Bot: " + config.botName + "\n┃✧ Prefix: [ " + v397 + " ]\n┃✧ Owner: " + v399 + "\n┃✧ Platform: " + v398 + "\n┃✧ Status: 🟢 Online \n┃✧ Time: " + new Date().toLocaleString() + "\n┃✧ T.Group: t.me/juneOff\n┃✧ Telegram: t.me/supremlord\n┗━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    const v400 = v31("┏━━━━━━✧ CONNECTED ✧━━━━━━━\n┃✧ Bot: " + config.botName + "\n┃✧ Prefix: [ " + v397 + " ]\n┃✧ Owner: " + v399 + "\n┃✧ Platform: " + v398 + "\n┃✧ Status: 🟢 Online \n┃✧ Time: " + new Date().toLocaleString() + "\n┗━━━━━━━━━━━━━━━━━━━━━━━━━━");
     const v401 = {
       text: v400
     };

@@ -47,7 +47,7 @@ const buildExif = ({
   categories = []
 }) => {
   const json = {
-    'sticker-pack-id': `com.junex.${Date.now()}`,
+    'sticker-pack-id': `com.cyntronx.${Date.now()}`,
     'sticker-pack-name': pack,
     'sticker-pack-publisher': author,
     'emojis': categories

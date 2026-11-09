@@ -14,7 +14,7 @@ const {
   resolveQuoted
 } = require('../../utils/quotedMedia');
 const ffmpegPath = require('../../utils/ffmpegPath');
-const TEMP_DIR = path.join(os.tmpdir(), 'june-x-audio');
+const TEMP_DIR = path.join(os.tmpdir(), 'cyntron-x-audio');
 if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR, {
   recursive: true
 });

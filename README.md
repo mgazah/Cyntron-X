@@ -71,6 +71,8 @@ npm start
 | `TELEGRAM_TOKEN` | — | `telegramsticker` and Telegram helpers |
 | `GROQ_API_KEY` | — | `transcribe` (speech-to-text via Groq) |
 | `OPENWEATHER_API_KEY` | — | `weather` command |
+| `AI_API_URL` / `AI_API_KEY` / `AI_BOT_ID` | — | `.chatbot` AI replies |
+| `PAIR_API` | — | pairing service used by `.pair` |
 
 Never commit `.env`, `auth/`, or session folders — they are git-ignored.
 

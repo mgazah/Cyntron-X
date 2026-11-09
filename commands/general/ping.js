@@ -1,4 +1,4 @@
-/* by supreme */
+/* Cyntron-X */
 const config = require('../../config');
 const {
   applyFont

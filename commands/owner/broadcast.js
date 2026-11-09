@@ -22,7 +22,7 @@ module.exports = {
       for (const group of groups) {
         try {
           await sock.sendMessage(group.id, {
-            text: `\n${message}\n\n> ©June`
+            text: `\n${message}\n\n> ©Cyntron-X`
           });
           success++;
         } catch (e) {

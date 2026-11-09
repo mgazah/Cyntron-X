@@ -36,7 +36,7 @@ module.exports = {
       // Derive sender (for logging)
 
       // Use system temp directory
-      const tempDir = path.join(os.tmpdir(), "june-x-temp");
+      const tempDir = path.join(os.tmpdir(), "cyntron-x-temp");
       if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, {
         recursive: true
       });

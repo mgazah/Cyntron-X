@@ -49,28 +49,26 @@
 
 | Method | Button |
 |--------|--------|
-| **Pair Code 1** | <a href="https://pair-junex.onrender.com/"><img src="https://img.shields.io/badge/Pair%20Code%20%231-1a1a4e?style=for-the-badge&logo=whatsapp&logoColor=white&logoSize=auto"/></a> |
-| **Pair Code 2** | <a href="https://pairjune.xwolf.space/"><img src="https://img.shields.io/badge/Pair%20Code%20%232-1a1a4e?style=for-the-badge&logo=whatsapp&logoColor=white&logoSize=auto"/></a> |
-| **QR Code** | <a href="https://pair-junex-code-5b6454f71d47.herokuapp.com/qr"><img src="https://img.shields.io/badge/QR%20Code%20%233-1a1a4e?style=for-the-badge&logo=whatsapp&logoColor=white&logoSize=auto"/></a> |
+| **Pair Code** | <a href="https://cyntron-x-pair.onrender.com/"><img src="https://img.shields.io/badge/Pair%20Code-1a1a4e?style=for-the-badge&logo=whatsapp&logoColor=white&logoSize=auto"/></a> |
+| **QR Code** | <a href="https://cyntron-x-pair.onrender.com/qr"><img src="https://img.shields.io/badge/QR%20Code-1a1a4e?style=for-the-badge&logo=whatsapp&logoColor=white&logoSize=auto"/></a> |
 
 </div>
 
 ---
 
-> 💬 Support & Community
+> 💬 Support
 
 <div align="center">
 
 | Platform | Link |
 |----------|------|
-| **WhatsApp Group** | <a href="https://whatsapp.com/channel/0029VbBzXBN2kNFoxm7LiG3Q"><img src="https://img.shields.io/badge/WhatsApp%20Group-25D366?style=for-the-badge&logo=whatsapp&logoColor=white&logoSize=auto"/></a> |
-| **YouTube** | <a href="#"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white&logoSize=auto"/></a> |
-| **Telegram** | <a href="t.me/supremLord"><img src="https://img.shields.io/badge/Telegram-0088cc?style=for-the-badge&logo=telegram&logoColor=white&logoSize=auto"/></a> |
+| **Issues** | <a href="https://github.com/mgazah/Cyntron-X/issues"><img src="https://img.shields.io/badge/GitHub%20Issues-24292e?style=for-the-badge&logo=github&logoColor=white&logoSize=auto"/></a> |
+| **Owner WhatsApp** | <a href="https://wa.me/254116368398"><img src="https://img.shields.io/badge/Owner%20WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white&logoSize=auto"/></a> |
 
 </div>
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/Vinpink2">Supreme</a></sub>
+  <sub>Built by <a href="https://github.com/mgazah">UNSTOPPABLE</a></sub>
 </div>
