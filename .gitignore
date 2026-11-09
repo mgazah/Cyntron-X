@@ -1,0 +1,33 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# WhatsApp / Baileys session credentials
+auth/
+auth-backup-*/
+session/
+sessions/
+*.session
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build / runtime artifacts
+dist/
+build/
+coverage/
+*.log
+tmp/
+.pnpm-store/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/

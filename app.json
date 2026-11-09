@@ -1,0 +1,38 @@
+{
+  "name": "Cyntron-X",
+  "description": "Cyntron-X - WhatsApp MD Multi-Device Bot powered by Baileys",
+  "repository": "https://github.com/Vinpink2/June-Ultra",
+  "logo": "",
+  "keywords": [
+    "whatsapp",
+    "baileys",
+    "bot",
+    "node",
+    "md",
+    "unstoppable"
+  ],
+  "stack": "heroku-26",
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs.git"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "env": {
+    "SESSION_ID": {
+      "description": "Cyntron-X session string. Primary format: Cyntron-X:~; legacy formats including unstoppable:~, sanezo:~, and suniza:~ are also accepted",
+      "required": false,
+      "value": ""
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Cyntron-X",
+  "description": "Professional WhatsApp Bot with auto-session authentication",
+  "repository": "https://github.com/Vinpink2/June-Ultra",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "npm install"
+  },
+  "deploy": {
+    "startCommand": "node index.js",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "variables": {
+    "SESSION_ID": {
+      "description": "REQUIRED: Your session ID. Must begin with 'Cyntron-X:~'",
+      "required": true
+    }
+  }
+}

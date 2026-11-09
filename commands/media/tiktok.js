@@ -1,0 +1,172 @@
+// commands/tiktok.js
+
+const axios = require('axios');
+const {
+  sendButtons
+} = require('gifted-btns');
+const config = require('../../config');
+const processedMessages = new Set();
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function extractButtonResponseId(msg) {
+  return msg.message?.buttonsResponseMessage?.selectedButtonId || msg.message?.templateButtonReplyMessage?.selectedId || msg.message?.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson || null;
+}
+function getResponseSender(msg) {
+  return msg.key?.participant || msg.key?.remoteJid;
+}
+function getTikTokButtons(videoId, dateNow, tiktokUrl) {
+  const prefix = config.prefix || '.';
+  return [{
+    id: `${prefix}ttvideo_${videoId}_${dateNow}`,
+    text: '🎬 Video (No Watermark)'
+  }, {
+    name: 'cta_url',
+    buttonParamsJson: JSON.stringify({
+      display_text: '🔗 Open on TikTok',
+      url: tiktokUrl
+    })
+  }];
+}
+const tiktokPattern = /https?:\/\/(?:(?:www|vm|vt|m)\.)?tiktok\.com\/\S+/i;
+
+// ── Module ────────────────────────────────────────────────────────────────────
+
+module.exports = {
+  name: 'tiktok2',
+  aliases: ['tt2', 'ttdl2', 'tiktokdl2'],
+  category: 'media',
+  description: 'Download TikTok videos without watermark',
+  usage: '.tiktok <TikTok URL>',
+  async execute(sock, msg, args, extra) {
+    const from = extra.from;
+    try {
+      if (processedMessages.has(msg.key.id)) return;
+      processedMessages.add(msg.key.id);
+      setTimeout(() => processedMessages.delete(msg.key.id), 5 * 60 * 1000);
+      const url = args.join(' ').trim();
+      if (!url) {
+        return await sock.sendMessage(from, {
+          text: `❌ Please provide a TikTok URL.\n\nUsage: \`${config.prefix || '.'}tiktok <URL>\``
+        }, {
+          quoted: msg
+        });
+      }
+      if (!tiktokPattern.test(url)) {
+        return await sock.sendMessage(from, {
+          text: '❌ Invalid TikTok URL. Please send a valid TikTok video link.'
+        }, {
+          quoted: msg
+        });
+      }
+      await sock.sendMessage(from, {
+        react: {
+          text: '⏳',
+          key: msg.key
+        }
+      });
+      const apiResponse = await axios.get('https://www.tikwm.com/api/', {
+        params: {
+          url,
+          hd: 1
+        },
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0'
+        }
+      });
+      const {
+        code,
+        msg: apiMsg,
+        data
+      } = apiResponse.data;
+      if (code !== 0 || !data) {
+        console.error('[tiktok] API error:', apiMsg);
+        return await sock.sendMessage(from, {
+          text: `❌ Failed to fetch video: ${apiMsg || 'Unknown error'}. Try again later.`
+        }, {
+          quoted: msg
+        });
+      }
+      const dateNow = Date.now();
+      const videoId = data.id || dateNow.toString();
+      const originalSender = msg.key?.participant || msg.key?.remoteJid;
+      await sendButtons(sock, from, {
+        title: '📥 TIKTOK DOWNLOADER',
+        text: `⿻ *Author:* @${data.author?.unique_id || 'unknown'}\n` + `⿻ *Caption:* ${(data.title || 'N/A').substring(0, 80)}\n` + `⿻ *Duration:* ${data.duration ?? 'N/A'}s\n` + `⿻ *Likes:* ${(data.digg_count ?? 0).toLocaleString()}\n` + `⿻ *Comments:* ${(data.comment_count ?? 0).toLocaleString()}\n` + `⿻ *Shares:* ${(data.share_count ?? 0).toLocaleString()}\n\n` + `*Select download format:*`,
+        footer: `Made by ${config.botName}`,
+        buttons: getTikTokButtons(videoId, dateNow, url)
+      }, {
+        quoted: msg
+      });
+      await sock.sendMessage(from, {
+        react: {
+          text: '✅',
+          key: msg.key
+        }
+      });
+
+      // cta_url button opens TikTok natively — no listener needed for it.
+      // Listener only handles the Video download button.
+      const handleResponse = async event => {
+        const messageData = event.messages[0];
+        if (!messageData?.message) return;
+        const selectedButtonId = extractButtonResponseId(messageData);
+        if (!selectedButtonId) return;
+        if (!selectedButtonId.includes(`_${dateNow}`)) return;
+        if (messageData.key?.remoteJid !== from) return;
+        const responseSender = getResponseSender(messageData);
+        if (from.endsWith('@g.us') && responseSender !== originalSender) return;
+        sock.ev.off('messages.upsert', handleResponse);
+        await sock.sendMessage(from, {
+          react: {
+            text: '⬇️',
+            key: msg.key
+          }
+        });
+        try {
+          const videoUrl = data.hdplay || data.play || data.wmplay;
+          if (!videoUrl) throw new Error('No download URL found in API response.');
+          await sock.sendMessage(from, {
+            video: {
+              url: videoUrl
+            },
+            mimetype: 'video/mp4'
+          }, {
+            quoted: messageData
+          });
+          await sock.sendMessage(from, {
+            react: {
+              text: '✅',
+              key: msg.key
+            }
+          });
+        } catch (err) {
+          console.error('[tiktok] download error:', err.message);
+          await sock.sendMessage(from, {
+            react: {
+              text: '❌',
+              key: msg.key
+            }
+          });
+          await sock.sendMessage(from, {
+            text: `🚫 Error: ${err.message}\n\n_Try again later._`
+          }, {
+            quoted: messageData
+          });
+        }
+      };
+      sock.ev.on('messages.upsert', handleResponse);
+
+      // Auto cleanup after 5 minutes
+      setTimeout(() => sock.ev.off('messages.upsert', handleResponse), 5 * 60 * 1000);
+    } catch (error) {
+      console.error('[tiktok] command error:', error.message || error);
+      await sock.sendMessage(from, {
+        text: '❌ An unexpected error occurred. Please try again.'
+      }, {
+        quoted: msg
+      });
+    }
+  }
+};
