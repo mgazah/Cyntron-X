@@ -3,7 +3,7 @@
 **WhatsApp MD bot built on Baileys 7.x — 237 commands across 17 categories**
 
 <p align="left">
-  <img alt="Version" src="https://img.shields.io/badge/VERSION-2.8.8-blue?style=for-the-badge">
+  <img alt="Version" src="https://img.shields.io/badge/VERSION-1.0.0-blue?style=for-the-badge">
   <img alt="Node" src="https://img.shields.io/badge/NODE-%3E%3D18-339933?style=for-the-badge&logo=node.js&logoColor=white">
   <img alt="Library" src="https://img.shields.io/badge/BAILEYS-7.0.0--rc13-25D366?style=for-the-badge&logo=whatsapp&logoColor=white">
   <img alt="Archived" src="https://img.shields.io/badge/ARCHIVED-NO-00FF88?style=for-the-badge">
