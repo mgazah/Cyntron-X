@@ -13,7 +13,7 @@ Cyntron-X is a multi-device WhatsApp bot: a single Node.js process that pairs wi
 
 ---
 
-## ✨ What's inside
+## ✨ contents 
 
 | Area | Details |
 |---|---|
