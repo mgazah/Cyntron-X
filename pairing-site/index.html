@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Cyntron-X | Link your WhatsApp</title>
+  <meta name="description" content="Link your WhatsApp to Cyntron-X in under a minute with a pairing code or QR code.">
+  <meta name="theme-color" content="#07060f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="bg-glow bg-glow-purple"></div>
+    <div class="bg-glow bg-glow-teal"></div>
+    <div class="bg-glow bg-glow-pink"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Cyntron-X home">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3"/><rect x="4" y="6" width="16" height="13" rx="4"/><path d="M9 12v1.5M15 12v1.5"/></svg>
+      </span>
+      <span class="brand-name">Cyntron-X</span>
+    </a>
+    <span class="status-pill" id="bot-status" data-state="unknown">
+      <span class="status-dot"></span>
+      <span id="bot-status-text">Bot status</span>
+    </span>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Link your <span class="grad">WhatsApp to</span> Cyntron-X in under <span class="grad">a minute</span></h1>
+        <p class="lead">Get a pairing code, type it into WhatsApp, and your bot goes live. No password and no extra app.</p>
+        <ul class="chips">
+          <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Works with any WhatsApp number</li>
+          <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Session saves automatically</li>
+          <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlink anytime from your phone</li>
+        </ul>
+      </div>
+
+      <div class="card-wrap">
+        <div class="orb" aria-hidden="true">
+          <span class="orb-ring"></span>
+          <span class="orb-core">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><rect x="4" y="6" width="16" height="13" rx="4"/><path d="M9 12v1.5M15 12v1.5"/></svg>
+          </span>
+        </div>
+
+        <div class="card">
+          <h2>Link a device</h2>
+          <p class="card-sub">Pick how you want to connect</p>
+
+          <div class="tabs" role="tablist" aria-label="Connection method">
+            <span class="tab-thumb" aria-hidden="true"></span>
+            <button class="tab is-active" role="tab" id="tab-code" aria-selected="true" aria-controls="panel-code" type="button">Pairing code</button>
+            <button class="tab" role="tab" id="tab-qr" aria-selected="false" aria-controls="panel-qr" type="button" tabindex="-1">QR code</button>
+          </div>
+
+          <!-- Pairing code panel -->
+          <div class="panel" id="panel-code" role="tabpanel" aria-labelledby="tab-code">
+            <form id="pair-form" novalidate>
+              <label class="field-label" for="phone">Your WhatsApp number</label>
+              <div class="phone-field" id="phone-field">
+                <div class="country">
+                  <span class="country-face" aria-hidden="true">
+                    <span id="country-flag">🇳🇬</span>
+                    <span id="country-dial">+234</span>
+                  </span>
+                  <select id="country" aria-label="Country code"></select>
+                </div>
+                <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="801 234 5678" maxlength="18" aria-describedby="phone-hint">
+              </div>
+              <p class="hint" id="phone-hint">Leave out the first 0. For 0801 234 5678, type 8012345678.</p>
+              <button class="btn-primary" type="submit" id="pair-btn">
+                <span class="btn-label">Get pairing code</span>
+                <span class="spinner" aria-hidden="true"></span>
+              </button>
+            </form>
+
+            <!-- Shown once a code has been issued -->
+            <div class="result" id="code-result" hidden>
+              <p class="field-label">Your pairing code</p>
+              <div class="code-box" id="code-box" aria-live="polite"></div>
+              <div class="result-row">
+                <span class="timer">Valid for <strong id="code-timer">5:00</strong></span>
+                <button class="btn-ghost" type="button" id="copy-btn">Copy code</button>
+              </div>
+              <p class="hint">In WhatsApp, open Linked devices, tap Link a device, then choose "Link with phone number instead" and type this code.</p>
+              <button class="btn-link" type="button" id="reset-btn">Use a different number</button>
+            </div>
+          </div>
+
+          <!-- QR panel -->
+          <div class="panel" id="panel-qr" role="tabpanel" aria-labelledby="tab-qr" hidden>
+            <div class="qr-frame">
+              <div class="qr-placeholder" id="qr-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17 20h4v-3"/></svg>
+                <span>Your QR code shows here</span>
+              </div>
+            </div>
+            <p class="hint center">In WhatsApp, open Linked devices, tap Link a device, and point your camera at the code.</p>
+            <button class="btn-primary" type="button" id="qr-btn">
+              <span class="btn-label">Generate QR code</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <p class="notice" id="notice" role="status" hidden></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps" aria-label="How it works">
+      <article class="step">
+        <span class="step-num">1</span>
+        <h3>Enter your number</h3>
+        <p>Type the WhatsApp number you want to link, with its country code.</p>
+      </article>
+      <article class="step">
+        <span class="step-num">2</span>
+        <h3>Get your code</h3>
+        <p>You receive an 8-character pairing code. It stays valid for five minutes.</p>
+      </article>
+      <article class="step">
+        <span class="step-num">3</span>
+        <h3>Confirm on your phone</h3>
+        <p>Enter the code in Linked devices and Cyntron-X connects right away.</p>
+      </article>
+    </section>
+
+    <footer class="footer">
+      Cyntron-X is not affiliated with WhatsApp or Meta. You can unlink it any time from Linked devices in WhatsApp.
+    </footer>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
