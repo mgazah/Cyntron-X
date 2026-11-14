@@ -130,7 +130,17 @@ app.use((err, req, res, next) => {
 
 /* ---------- Start ---------- */
 
-const server = app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', (err) => {
+  // Express 5 calls this with an error when the port cannot be opened.
+  if (err) {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`[server] Port ${PORT} is already used by another program, so the pairing API did not start.`);
+      console.error('[server] Stop that program, or pick another port, for example: PORT=8090 npm run dev');
+    } else {
+      console.error(`[server] Could not start on port ${PORT}: ${err.message}`);
+    }
+    process.exit(1);
+  }
   console.log(`[server] pairing API listening on port ${PORT}`);
   if (!ALLOWED_ORIGINS.length) {
     console.warn('[server] ALLOWED_ORIGINS is empty, so browsers on other sites cannot call this API.');
