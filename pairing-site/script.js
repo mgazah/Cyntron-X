@@ -18,7 +18,7 @@
  * No trailing slash. Once the site is on Vercel (https) the
  * server address must be https too, or browsers will block it.
  * ============================================================ */
-var API_BASE_URL = 'http://localhost:8090';
+var API_BASE_URL = 'https://cyntron-x-32qb.onrender.com';
 
 (function () {
   'use strict';
