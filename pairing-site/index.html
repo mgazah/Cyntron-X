@@ -30,7 +30,7 @@
     </a>
     <span class="status-pill" id="bot-status" data-state="unknown">
       <span class="status-dot"></span>
-      <span id="bot-status-text">Bot status</span>
+      <span id="bot-status-text">Checking</span>
     </span>
    </div>
   </header>
@@ -119,6 +119,17 @@
             </button>
           </div>
 
+          </div>
+
+          <!-- Shown once the phone confirms the link -->
+          <div class="linked" id="linked" hidden>
+            <span class="linked-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </span>
+            <h3>Device linked</h3>
+            <p>Your session ID was sent to your own WhatsApp chat. Copy all of it and set it as <code>SESSION_ID</code> where you host your bot.</p>
+            <p class="hint center">Keep it private. Anyone who has it can use your WhatsApp account.</p>
+            <button class="btn-ghost" type="button" id="again-btn">Link another number</button>
           </div>
 
           <p class="notice" id="notice" role="status" hidden></p>

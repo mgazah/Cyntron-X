@@ -1,15 +1,25 @@
 /*
- * Cyntron-X pairing site: UI layer only.
+ * Cyntron-X pairing site.
  *
- * Nothing here talks to the bot yet. The two functions in the "Backend hooks"
- * section are where the real requests go once the pairing API exists.
- * Until then they reject, and the UI says so instead of showing a fake code.
+ * Talks to the pairing server in ../pairing-server.
  *
- * To look at the finished states while designing, open:
- *   ?preview=code   pairing code result with a sample code
- *   ?preview=qr     QR tab
- *   ?preview=online "Bot online" pill
+ * To look at finished states without a server, open:
+ *   ?preview=code     pairing code result with a sample code
+ *   ?preview=qr       QR tab
+ *   ?preview=linked   success screen
  */
+
+/* ============================================================
+ * PAIRING SERVER ADDRESS: change this one line when you deploy.
+ *
+ *   Local:     'http://localhost:8090'
+ *   Deployed:  'https://your-pairing-server.onrender.com'
+ *
+ * No trailing slash. Once the site is on Vercel (https) the
+ * server address must be https too, or browsers will block it.
+ * ============================================================ */
+var API_BASE_URL = 'http://localhost:8090';
+
 (function () {
   'use strict';
 
@@ -47,16 +57,81 @@
   var notice = $('notice');
   var timerId = null;
 
-  /* ---------- Backend hooks (wire these up in the logic phase) ---------- */
+  /* ---------- Pairing server ---------- */
+
+  var API = API_BASE_URL.replace(/\/+$/, '');
+  var POLL_MS = 3000;
+  var HEALTH_MS = 30000;
+  var active = null; // the link attempt being watched: { id, mode, timer }
+
+  // Calls the server and returns its JSON. Rejects with an Error whose
+  // message is safe to show to the user.
+  function api(path, options) {
+    var ctrl = new AbortController();
+    var kill = setTimeout(function () { ctrl.abort(); }, 45000);
+    var opts = options || {};
+    opts.signal = ctrl.signal;
+    return fetch(API + path, opts)
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (res.ok) return data;
+          var err = new Error((data.error && data.error.message) || 'The pairing server returned an error. Try again.');
+          err.status = res.status;
+          throw err;
+        });
+      }, function () {
+        throw new Error('Cannot reach the pairing server. Check your connection and try again.');
+      })
+      .finally(function () { clearTimeout(kill); });
+  }
 
   function requestPairingCode(fullNumber) {
-    // Expected to resolve with { code: 'ABCD1234', expiresIn: 300 }
-    return Promise.reject(new Error('NOT_CONNECTED'));
+    return api('/api/pair', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ number: fullNumber })
+    });
   }
 
   function requestQrCode() {
-    // Expected to resolve with { image: 'data:image/png;base64,...' }
-    return Promise.reject(new Error('NOT_CONNECTED'));
+    return api('/api/qr', { method: 'POST' });
+  }
+
+  // Watches a link attempt until the phone confirms, it expires, or it fails.
+  function watch(id, mode) {
+    stopWatching();
+    var mine = active = { id: id, mode: mode, timer: null };
+    function poll() {
+      api('/api/session/' + id).then(function (s) {
+        if (active !== mine) return;
+        if (s.status === 'pending') {
+          if (mode === 'qr' && s.qr) showQr(s.qr);
+          mine.timer = setTimeout(poll, POLL_MS);
+        } else if (s.status === 'linked') {
+          stopWatching();
+          showLinked();
+        } else {
+          endAttempt(s.message || 'This link attempt ended. Start again.');
+        }
+      }, function (err) {
+        if (active !== mine) return;
+        if (err.status === 404) endAttempt('This link attempt expired. Start again.');
+        else mine.timer = setTimeout(poll, POLL_MS); // brief network trouble: keep trying
+      });
+    }
+    mine.timer = setTimeout(poll, POLL_MS);
+  }
+
+  function stopWatching() {
+    if (active) clearTimeout(active.timer);
+    active = null;
+  }
+
+  function endAttempt(message) {
+    stopWatching();
+    resetCode();
+    resetQr();
+    showNotice(message, true);
   }
 
   /* ---------- Country picker ---------- */
@@ -121,7 +196,11 @@
 
   /* ---------- Notice ---------- */
 
-  function showNotice(msg) { notice.textContent = msg; notice.hidden = false; }
+  function showNotice(msg, isError) {
+    notice.textContent = msg;
+    notice.classList.toggle('is-error', !!isError);
+    notice.hidden = false;
+  }
   function hideNotice() { notice.hidden = true; }
 
   function setLoading(btn, on) {
@@ -177,9 +256,8 @@
       var m = Math.floor(left / 60), s = left % 60;
       timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
       if (left <= 0) {
-        clearInterval(timerId);
-        resetCode();
-        showNotice('That code expired. Request a new one.');
+        endAttempt('That code expired. Request a new one.');
+        return;
       }
       left -= 1;
     }
@@ -201,18 +279,19 @@
     if (err) { showError(err); phone.focus(); return; }
 
     var full = COUNTRIES[country.selectedIndex][2] + digits();
+    stopWatching();
+    resetQr();
     setLoading(pairBtn, true);
     requestPairingCode(full)
-      .then(function (res) { showCode(res.code, res.expiresIn || 300); })
-      .catch(function (error) {
-        showNotice(error.message === 'NOT_CONNECTED'
-          ? 'Your number looks good. Pairing is not switched on yet, so no code was requested.'
-          : 'Could not get a code. Try again in a moment.');
+      .then(function (res) {
+        showCode(res.code, res.expiresIn || 300);
+        watch(res.id, 'code');
       })
+      .catch(function (error) { showNotice(error.message, true); })
       .then(function () { setLoading(pairBtn, false); });
   });
 
-  $('reset-btn').addEventListener('click', function () { resetCode(); phone.focus(); });
+  $('reset-btn').addEventListener('click', function () { stopWatching(); resetCode(); phone.focus(); });
 
   $('copy-btn').addEventListener('click', function () {
     var btn = this, code = codeBox.dataset.code || '';
@@ -229,37 +308,87 @@
 
   /* ---------- QR flow ---------- */
 
+  var qrBox = $('qr-box');
+  var qrEmpty = qrBox.innerHTML;
+  var qrLabel = qrBtn.querySelector('.btn-label');
+
+  function showQr(src) {
+    var img = qrBox.querySelector('img');
+    if (!img) {
+      img = new Image();
+      img.alt = 'WhatsApp linking QR code';
+      qrBox.textContent = '';
+      qrBox.appendChild(img);
+      qrBox.classList.add('has-qr');
+    }
+    if (img.src !== src) img.src = src;
+    qrLabel.textContent = 'Get a new QR code';
+  }
+
+  function resetQr() {
+    qrBox.innerHTML = qrEmpty;
+    qrBox.classList.remove('has-qr');
+    qrLabel.textContent = 'Generate QR code';
+  }
+
   qrBtn.addEventListener('click', function () {
     hideNotice();
+    stopWatching();
+    resetCode();
     setLoading(qrBtn, true);
     requestQrCode()
       .then(function (res) {
-        var img = new Image();
-        img.alt = 'WhatsApp linking QR code';
-        img.src = res.image;
-        $('qr-box').textContent = '';
-        $('qr-box').appendChild(img);
+        showQr(res.qr);
+        watch(res.id, 'qr');
       })
-      .catch(function (error) {
-        showNotice(error.message === 'NOT_CONNECTED'
-          ? 'QR linking is not switched on yet.'
-          : 'Could not load a QR code. Try again in a moment.');
-      })
+      .catch(function (error) { resetQr(); showNotice(error.message, true); })
       .then(function () { setLoading(qrBtn, false); });
   });
 
-  /* ---------- Bot status pill ---------- */
+  /* ---------- Linked (success) screen ---------- */
+
+  var linked = $('linked'), panels = document.querySelector('.panels');
+
+  function showLinked() {
+    resetCode();
+    resetQr();
+    tabs.hidden = true;
+    panels.hidden = true;
+    linked.hidden = false;
+    $('again-btn').focus();
+  }
+
+  $('again-btn').addEventListener('click', function () {
+    linked.hidden = true;
+    tabs.hidden = false;
+    panels.hidden = false;
+    phone.value = '';
+    selectTab('code');
+  });
+
+  /* ---------- Server status pill ---------- */
 
   function setStatus(state) {
-    var labels = { online: 'Bot online', offline: 'Bot offline', unknown: 'Bot status' };
+    var labels = { online: 'Bot online', offline: 'Bot offline', unknown: 'Checking' };
     $('bot-status').dataset.state = state;
     $('bot-status-text').textContent = labels[state];
+  }
+
+  function checkHealth() {
+    api('/health').then(
+      function (d) { setStatus(d.status === 'ok' ? 'online' : 'offline'); },
+      function () { setStatus('offline'); }
+    );
   }
 
   /* ---------- Design previews ---------- */
 
   var preview = new URLSearchParams(location.search).get('preview');
-  if (preview === 'code') { setStatus('online'); showCode('CYNT7X24', 300); showNotice('Design preview. This is a sample code and will not link a device.'); }
-  if (preview === 'qr') { setStatus('online'); selectTab('qr'); }
-  if (preview === 'online') setStatus('online');
+  if (preview === 'code') { showCode('CYNT7X24', 300); showNotice('Design preview. This is a sample code and will not link a device.'); }
+  if (preview === 'qr') selectTab('qr');
+  if (preview === 'linked') showLinked();
+
+  setStatus('unknown');
+  checkHealth();
+  setInterval(checkHealth, HEALTH_MS);
 })();

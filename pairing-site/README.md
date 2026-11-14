@@ -14,8 +14,14 @@ npx serve pairing-site
 2. Set **Root Directory** to `pairing-site`.
 3. Framework preset: **Other**. Leave the build command and output directory empty.
 
-## Status
+## Pairing server address
 
-UI only. `requestPairingCode()` and `requestQrCode()` in `script.js` are stubs that the pairing API will replace.
+The site calls the pairing server in `../pairing-server`. Its address is the `API_BASE_URL` line at the top of `script.js`:
 
-Design previews: add `?preview=code`, `?preview=qr` or `?preview=online` to the URL.
+```js
+var API_BASE_URL = 'http://localhost:8090';
+```
+
+Change it to your deployed server URL before going live. It must be `https` once the site is on Vercel, and the server's `ALLOWED_ORIGINS` must include the site's URL.
+
+Design previews (no server needed): add `?preview=code`, `?preview=qr` or `?preview=linked` to the URL.

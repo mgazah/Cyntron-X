@@ -553,6 +553,54 @@ h1 {
   text-align: center;
 }
 
+.notice.is-error {
+  border-color: rgba(251, 113, 133, 0.35);
+  background: rgba(251, 113, 133, 0.08);
+  color: #fecdd3;
+}
+
+.qr-placeholder.has-qr {
+  padding: 8px;
+  border-style: solid;
+  background: #fff;
+}
+
+/* Linked (success) screen */
+.linked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 4px;
+  text-align: center;
+}
+.linked-icon {
+  display: grid;
+  place-items: center;
+  width: 60px; height: 60px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.14);
+  border: 1.5px solid rgba(52, 211, 153, 0.5);
+  color: var(--green);
+}
+.linked-icon svg { width: 28px; height: 28px; }
+.linked h3 {
+  margin: 0 0 8px;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.linked p { margin: 0; color: var(--muted); font-size: 13.5px; }
+.linked code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-size: 12.5px;
+}
+.linked .hint { margin-top: 10px; }
+.linked .btn-ghost { margin-top: 20px; }
+
 /* ---------- Steps ---------- */
 .steps {
   display: grid;
