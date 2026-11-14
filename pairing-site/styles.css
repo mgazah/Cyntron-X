@@ -132,7 +132,8 @@ button { cursor: pointer; }
   background: linear-gradient(135deg, #7c5cff, #f04bd8);
   box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45);
 }
-.brand-mark svg { width: 18px; height: 18px; }
+.brand-mark { overflow: hidden; }
+.brand-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .status-pill {
   display: inline-flex;
@@ -243,7 +244,8 @@ h1 {
   background: radial-gradient(circle at 30% 25%, #a78bfa, #6d3df0 70%);
   box-shadow: 0 10px 30px rgba(124, 58, 237, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
-.orb-core svg { width: 26px; height: 26px; }
+.orb-core { overflow: hidden; }
+.orb-core img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .orb-ring {
   position: absolute;
   inset: 0;
