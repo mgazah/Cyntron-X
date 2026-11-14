@@ -21,6 +21,7 @@
   </div>
 
   <header class="topbar">
+   <div class="topbar-inner">
     <a class="brand" href="./" aria-label="Cyntron-X home">
       <span class="brand-mark">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3"/><rect x="4" y="6" width="16" height="13" rx="4"/><path d="M9 12v1.5M15 12v1.5"/></svg>
@@ -31,6 +32,7 @@
       <span class="status-dot"></span>
       <span id="bot-status-text">Bot status</span>
     </span>
+   </div>
   </header>
 
   <main class="page">
@@ -63,8 +65,9 @@
             <button class="tab" role="tab" id="tab-qr" aria-selected="false" aria-controls="panel-qr" type="button" tabindex="-1">QR code</button>
           </div>
 
+          <div class="panels">
           <!-- Pairing code panel -->
-          <div class="panel" id="panel-code" role="tabpanel" aria-labelledby="tab-code">
+          <div class="panel is-active" id="panel-code" role="tabpanel" aria-labelledby="tab-code">
             <form id="pair-form" novalidate>
               <label class="field-label" for="phone">Your WhatsApp number</label>
               <div class="phone-field" id="phone-field">
@@ -82,6 +85,10 @@
                 <span class="btn-label">Get pairing code</span>
                 <span class="spinner" aria-hidden="true"></span>
               </button>
+              <p class="where">
+                <strong>Where the code goes</strong>
+                WhatsApp &rsaquo; Linked devices &rsaquo; Link a device &rsaquo; Link with phone number instead
+              </p>
             </form>
 
             <!-- Shown once a code has been issued -->
@@ -98,18 +105,20 @@
           </div>
 
           <!-- QR panel -->
-          <div class="panel" id="panel-qr" role="tabpanel" aria-labelledby="tab-qr" hidden>
+          <div class="panel" id="panel-qr" role="tabpanel" aria-labelledby="tab-qr">
             <div class="qr-frame">
               <div class="qr-placeholder" id="qr-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17 20h4v-3"/></svg>
                 <span>Your QR code shows here</span>
               </div>
             </div>
-            <p class="hint center">In WhatsApp, open Linked devices, tap Link a device, and point your camera at the code.</p>
+            <p class="hint center">Open Linked devices in WhatsApp, tap Link a device, then scan this code.</p>
             <button class="btn-primary" type="button" id="qr-btn">
               <span class="btn-label">Generate QR code</span>
               <span class="spinner" aria-hidden="true"></span>
             </button>
+          </div>
+
           </div>
 
           <p class="notice" id="notice" role="status" hidden></p>

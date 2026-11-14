@@ -140,8 +140,8 @@
     tabQr.setAttribute('aria-selected', String(isQr));
     tabCode.tabIndex = isQr ? -1 : 0;
     tabQr.tabIndex = isQr ? 0 : -1;
-    panelCode.hidden = isQr;
-    panelQr.hidden = !isQr;
+    panelCode.classList.toggle('is-active', !isQr);
+    panelQr.classList.toggle('is-active', isQr);
     hideNotice();
     if (focus) (isQr ? tabQr : tabCode).focus();
   }
