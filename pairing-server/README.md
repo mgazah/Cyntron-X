@@ -18,7 +18,7 @@ npm start
 | Variable | Default | Meaning |
 |---|---|---|
 | `PORT` | `8080` | Port to listen on |
-| `ALLOWED_ORIGINS` | empty | Comma-separated sites allowed to call the API from a browser, e.g. your Vercel URL |
+| `ALLOWED_ORIGINS` | empty | Comma-separated sites allowed to call the API from a browser, e.g. your Vercel URL. When empty, only pages on `localhost` are allowed |
 | `MAX_ACTIVE_SESSIONS` | `20` | Link attempts allowed in progress at once |
 | `RATE_LIMIT_MAX` | `5` | Link attempts one IP address can start in 10 minutes |
 

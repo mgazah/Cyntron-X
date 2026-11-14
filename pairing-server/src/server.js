@@ -21,6 +21,8 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
   .map((o) => o.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
+const LOCAL_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+
 const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1); // Render, Railway and similar hosts sit behind one proxy
@@ -30,6 +32,8 @@ app.use(cors({
   origin(origin, done) {
     // Requests with no Origin header (curl, the bot's .pair command) are not browser requests.
     if (!origin || ALLOWED_ORIGINS.includes('*') || ALLOWED_ORIGINS.includes(origin)) return done(null, true);
+    // With nothing configured, allow pages served from this same machine so local testing just works.
+    if (!ALLOWED_ORIGINS.length && LOCAL_ORIGIN.test(origin)) return done(null, true);
     return done(null, false);
   },
   methods: ['GET', 'POST']
@@ -143,7 +147,7 @@ const server = app.listen(PORT, '0.0.0.0', (err) => {
   }
   console.log(`[server] pairing API listening on port ${PORT}`);
   if (!ALLOWED_ORIGINS.length) {
-    console.warn('[server] ALLOWED_ORIGINS is empty, so browsers on other sites cannot call this API.');
+    console.warn('[server] ALLOWED_ORIGINS is empty: only pages on localhost can call this API. Set it to your site URL before deploying.');
   }
 });
 
