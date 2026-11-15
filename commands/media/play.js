@@ -64,7 +64,7 @@ async function downloadAudio(videoUrl) {
   return withRetry(async () => {
     try {
       // Primary
-      const primary = await axios.get(`https://apiskeith2-production-ec66.up.railway.app/download/audio?url=${encodeURIComponent(videoUrl)}`, {
+      const primary = await axios.get(`https://apis.megan.qzz.io=${encodeURIComponent(videoUrl)}`, {
         timeout: 60000
       });
       if (primary.data?.status && primary.data?.result) {
@@ -79,7 +79,7 @@ async function downloadAudio(videoUrl) {
       console.warn('[play2] primary API failed, using fallback:', err.message);
 
       // Fallback
-      const fallback = await axios.get(`https://yt-dl.officialhectormanuel.workers.dev/?url=${encodeURIComponent(videoUrl)}`, {
+      const fallback = await axios.get(`https://apis.megan.qzz.io=${encodeURIComponent(videoUrl)}`, {
         timeout: 60000
       });
       if (!fallback.data?.status || !fallback.data?.audio) {
