@@ -1,209 +1,114 @@
 /**
- * Song Command — powered by GiftedTech + DrexApp fallback
+ * song.js: YouTube Audio Downloader (OxBot song.php)
+ * Aliases: .song, .play, .ytmp3, .music
  */
 
-const yts = require('yt-search');
 const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const {
-  sendButtons
-} = require('gifted-btns');
-const config = require('../../config');
-const RETRY_DELAY = 3000;
+const https = require('https');
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ─── Config ──────────────────────────────────────────────────────────────
 
-function extractButtonResponseId(msg) {
-  return msg.message?.buttonsResponseMessage?.selectedButtonId || msg.message?.templateButtonReplyMessage?.selectedId || msg.message?.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson || null;
-}
-function getResponseSender(msg) {
-  return msg.key?.participant || msg.key?.remoteJid;
-}
-async function withRetry(fn, retries = 3, delayMs = RETRY_DELAY) {
-  let lastErr;
-  for (let i = 0; i < retries; i++) {
+const OXBOT_API_KEY  = process.env.OXBOT_API_KEY || ' ';
+const OXBOT_SONG_URL = 'https://lecay.oxbot.name.ng/api/song.php';
+
+const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 20 });
+
+// ═══════════════════════════════════════════════════════════════
+// DOWNLOAD (one request: search + resolve + audio bytes)
+// ═══════════════════════════════════════════════════════════════
+
+async function fetchSong(query) {
+    let res;
     try {
-      return await fn();
-    } catch (e) {
-      lastErr = e;
-      const isBusy = e.message?.toLowerCase().includes('busy') || e.message?.toLowerCase().includes('try again');
-      if (i < retries - 1 && isBusy) {
-        await new Promise(r => setTimeout(r, delayMs));
-      } else if (!isBusy) {
-        throw e;
-      }
-    }
-  }
-  throw lastErr;
-}
-async function searchYouTube(query) {
-  return withRetry(async () => {
-    const result = await yts(`${query} official`);
-    if (!result?.videos?.length) throw new Error('No results found');
-    return result.videos[0];
-  });
-}
-async function getVideoFromUrl(url) {
-  const ytId = (url.match(/(?:youtu\.be\/|v=)([a-zA-Z0-9_-]{11})/) || [])[1];
-  if (!ytId) throw new Error('Invalid YouTube URL');
-  const result = await yts({
-    videoId: ytId
-  });
-  if (!result?.title) throw new Error('Could not fetch video info');
-  return {
-    title: result.title,
-    timestamp: result.timestamp || '',
-    views: result.views || 0,
-    author: result.author || {},
-    url: url,
-    videoId: ytId
-  };
-}
-async function downloadAudio(videoUrl) {
-  return withRetry(async () => {
-    try {
-      // Primary
-      const primary = await axios.get(''https://apis.megan.qzz.io/api/download?url=${encodeURIComponent(videoUrl)}`, {
-        timeout: 60000
-      });
-      if (primary.data?.status && primary.data?.result) {
-        return {
-          status: true,
-          result: primary.data.result,
-          title: primary.data.title
-        };
-      }
-      throw new Error('Primary API failed');
+        res = await axios.get(OXBOT_SONG_URL, {
+            params: { api_key: OXBOT_API_KEY, q: query },
+            responseType: 'arraybuffer',
+            timeout: 150000,
+            maxContentLength: 100 * 1024 * 1024,
+            httpsAgent,
+            validateStatus: () => true,
+        });
     } catch (err) {
-      console.warn('[play2] primary API failed, using fallback:', err.message);
-
-      // Fallback
-      const fallback = await axios.get(''https://apis.megan.qzz.io/api/download?url=${encodeURIComponent(videoUrl)}`, {
-        timeout: 60000
-      });
-      if (!fallback.data?.status || !fallback.data?.audio) {
-        throw new Error('Fallback API failed to fetch audio');
-      }
-      return {
-        status: true,
-        result: fallback.data.audio,
-        title: fallback.data.title,
-        thumbnail: fallback.data.thumbnail
-      };
+        throw new Error(`Network error: ${err.code || err.message}`);
     }
-  });
-}
-function getSongButtons(videoId, dateNow) {
-  const prefix = config.prefix || '.';
-  return [{
-    id: `${prefix}audio_${videoId}_${dateNow}`,
-    text: '🎶 Audio'
-  }, {
-    id: `${prefix}audiodoc_${videoId}_${dateNow}`,
-    text: '📄 Audio Document'
-  }];
+
+    const buf  = Buffer.from(res.data);
+    const type = res.headers['content-type'] || '';
+
+    // Errors come back as JSON
+    if (res.status >= 400 || type.includes('application/json')) {
+        let msg = `HTTP ${res.status}`;
+        try { msg = JSON.parse(buf.toString('utf-8')).error || msg; } catch {}
+        if (res.status === 401) msg = 'API key invalid or expired';
+        if (res.status === 429) msg = 'Daily API limit reached';
+        throw new Error(msg);
+    }
+
+    if (buf.length < 5000) throw new Error(`Audio too small (${buf.length} bytes)`);
+
+    const dec = (h) => { try { return decodeURIComponent(res.headers[h] || ''); } catch { return ''; } };
+    const ext = (res.headers['x-audio-ext'] || 'm4a').toLowerCase();
+
+    return {
+        buf,
+        title:     dec('x-title') || 'song',
+        uploader:  dec('x-uploader'),
+        thumbnail: res.headers['x-thumbnail'] || null,
+        mimetype:  ext === 'mp3' ? 'audio/mpeg' : (ext === 'webm' || ext === 'opus') ? 'audio/ogg; codecs=opus' : 'audio/mp4',
+        ext,
+    };
 }
 
-// ── Module ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// MAIN EXECUTE
+// ═══════════════════════════════════════════════════════════════
+
+async function execute(sock, msg, botData, args) {
+    const chatId = msg.key.remoteJid;
+    if (!chatId) return null;
+
+    if (!args || args.length === 0) {
+        return `*🎵 SONG DOWNLOADER*\n\n*.song <name or link>* — Download YouTube audio\n\n*Aliases:* .play  .ytmp3  .music`;
+    }
+
+    const query = args.join(' ').trim();
+
+    try { await sock.sendPresenceUpdate('recording', chatId); } catch {}
+    try { await sock.sendMessage(chatId, { react: { text: '⬇️', key: msg.key } }); } catch {}
+
+    let song;
+    try {
+        song = await fetchSong(query);
+        console.log(`[SONG] ✓ ${song.title.substring(0, 40)} (${(song.buf.length / 1024).toFixed(0)} KB)`);
+    } catch (err) {
+        console.error('[SONG] Error:', err.message);
+        try { await sock.sendMessage(chatId, { react: { text: '❌', key: msg.key } }); } catch {}
+        return `❌ *Could not get that song*\n\n_${err.message}_`;
+    }
+
+    const safeTitle = song.title.replace(/[^\w\s\-()']/g, '').trim() || 'song';
+
+    try {
+        await sock.sendMessage(chatId, {
+            audio: song.buf,
+            mimetype: song.mimetype,
+            fileName: `${safeTitle}.${song.ext}`,
+            ptt: false,
+        }, { quoted: msg });
+
+        try { await sock.sendMessage(chatId, { react: { text: '✅', key: msg.key } }); } catch {}
+        return null;
+    } catch (err) {
+        console.error('[SONG] Send Error:', err.message);
+        try { await sock.sendMessage(chatId, { react: { text: '❌', key: msg.key } }); } catch {}
+        return `❌ *Failed to send audio*\n\n_${err.message}_`;
+    }
+}
 
 module.exports = {
-  name: 'play2',
-  aliases: ['song2', 'mp3', 'yta2'],
-  category: 'media',
-  description: 'Search and download YouTube songs as audio',
-  usage: '.play2 <song name or YouTube URL>',
-  async execute(sock, msg, args, extra) {
-    if (!args.length) {
-      return extra.reply(`🎵 *Song Downloader*\n\n` + `*Usage:*\n` + `• \`.play2 not like us\` — search by name\n` + `• \`.play2 https://youtu.be/xxx\` — use YouTube link\n` + `• Reply to a message with \`.play2\` — use replied text as query`);
-    }
-    let query = args.join(' ').trim();
-    if (!query) {
-      const quoted = extra?.quoted;
-      query = quoted?.conversation || quoted?.extendedTextMessage?.text || '';
-    }
-    if (!query) {
-      return extra.reply('🎵 Provide a song name or YouTube URL.\nExample: `.play2 Not Like Us`');
-    }
-    if (query.length > 200) {
-      return extra.reply('📝 Query too long! Max 200 chars.');
-    }
-    const from = extra.from;
-    await sock.sendMessage(from, {
-      react: {
-        text: '🎼',
-        key: msg.key
-      }
-    });
-
-    // Step 1: Search YouTube OR resolve URL directly
-    const isUrl = query.startsWith('http://') || query.startsWith('https://');
-    let video;
-    try {
-      video = isUrl ? await getVideoFromUrl(query) : await searchYouTube(query);
-    } catch (e) {
-      console.error('[play2] video resolve error:', e.message);
-      return extra.reply(`❌ ${isUrl ? 'Could not fetch video info' : 'Search failed'}: ${e.message}`);
-    }
-    const dateNow = Date.now();
-    const prefix = config.prefix || '.';
-    const originalSender = msg.key.participant || msg.key.remoteJid;
-
-    // Step 2: Send format selection buttons
-    await sendButtons(sock, from, {
-      title: `🎵 SONG DOWNLOADER`,
-      text: `⿻ *Title:* ${video.title}\n` + `⿻ *Duration:* ${video.timestamp || 'N/A'}\n` + `⿻ *Views:* ${video.views?.toLocaleString() ?? 'N/A'}\n` + `⿻ *Channel:* ${video.author?.name || 'N/A'}\n` + `⿻ *Link:* ${video.url}\n\n` + `*Select download format:*`,
-      footer: `Made by ${config.botName}`,
-      buttons: getSongButtons(video.videoId, dateNow)
-    }, {
-      quoted: msg
-    });
-    await sock.sendMessage(from, {
-      react: {
-        text: '✅',
-        key: msg.key
-      }
-    });
-
-    // Step 3: Listen for button responses — persistent, no expiry, multi-tap
-    const handleResponse = async event => {
-      const messageData = event.messages[0];
-      if (!messageData?.message) return;
-      const selectedButtonId = extractButtonResponseId(messageData);
-      if (!selectedButtonId) return;
-      if (!selectedButtonId.includes(`_${dateNow}`)) return;
-      if (messageData.key?.remoteJid !== from) return;
-      const responseSender = getResponseSender(messageData);
-      if (from.endsWith('@g.us') && responseSender !== originalSender) return;
-      await sock.sendMessage(from, {
-        react: {
-          text: '⬇️',
-          key: msg.key
-        }
-      });
-
-      // Step 4: Download & send
-      let filePath;
-      try {
-        const buttonType = selectedButtonId.replace(prefix, '').split('_')[0];
-        const apiData = await downloadAudio(video.url);
-        const tempDir = path.join(__dirname, 'temp');
-        if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
-        filePath = path.join(tempDir, `audio_${dateNow}.mp3`);
-        const audioStream = await axios({
-          method: 'get',
-          url: apiData.result,
-          responseType: 'stream',
-          timeout: 600000
-        });
-        const writer = fs.createWriteStream(filePath);
-        audioStream.data.pipe(writer);
-        await new Promise((resolve, reject) => {
-          writer.on('finish', resolve);
-          writer.on('error', reject);
-        });
-        if (!fs.existsSync(filePath) || fs.statSync(filePath).size === 0) {
-          throw new Error('Download failed — file is empty');
-        }
-        const title = apiData.title || video.title || '';
-        const cleanTitle = title.replace(/[^\w\s.-]/gi, '').substring(0, 
+    name:     'song',
+    aliases:  ['play', 'ytmp3', 'music'],
+    desc:     'Download song from YouTube (OxBot API)',
+    category: 'downloader',
+    execute,
+};
