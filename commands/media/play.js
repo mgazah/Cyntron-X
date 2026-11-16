@@ -1,114 +1,168 @@
+const axios = require('axios');
+const yts = require('yt-search');
+const config = require('../../config');
+
 /**
- * song.js: YouTube Audio Downloader (OxBot song.php)
- * Aliases: .song, .play, .ytmp3, .music
+ * Universal Music / Song Downloader
+ * Supports .play, .song, .music, .ytmp3, .yta, .audio
  */
 
-const axios = require('axios');
-const https = require('https');
-
-// ─── Config ──────────────────────────────────────────────────────────────
-
-const OXBOT_API_KEY  = process.env.OXBOT_API_KEY || ' ';
-const OXBOT_SONG_URL = 'https://lecay.oxbot.name.ng/api/song.php';
-
-const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 20 });
-
-// ═══════════════════════════════════════════════════════════════
-// DOWNLOAD (one request: search + resolve + audio bytes)
-// ═══════════════════════════════════════════════════════════════
-
-async function fetchSong(query) {
-    let res;
-    try {
-        res = await axios.get(OXBOT_SONG_URL, {
-            params: { api_key: OXBOT_API_KEY, q: query },
-            responseType: 'arraybuffer',
-            timeout: 150000,
-            maxContentLength: 100 * 1024 * 1024,
-            httpsAgent,
-            validateStatus: () => true,
-        });
-    } catch (err) {
-        throw new Error(`Network error: ${err.code || err.message}`);
+async function fetchAudioFromYtPlay(query) {
+  const res = await axios.get(`https://api.nexray.eu.cc/downloader/ytplay?q=${encodeURIComponent(query)}`, {
+    timeout: 25000,
+    headers: { 'User-Agent': 'Mozilla/5.0' }
+  });
+  if (res.data?.status && res.data?.result?.download_url) {
+    const r = res.data.result;
+    const dl = await axios.get(r.download_url, {
+      responseType: 'arraybuffer',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://api.nexray.eu.cc/'
+      },
+      timeout: 60000,
+      maxContentLength: 100 * 1024 * 1024
+    });
+    if (dl.data && dl.data.length > 5000) {
+      return {
+        buffer: Buffer.from(dl.data),
+        title: r.title || query,
+        duration: r.duration || '',
+        thumbnail: r.thumbnail || '',
+        channel: r.channel || ''
+      };
     }
-
-    const buf  = Buffer.from(res.data);
-    const type = res.headers['content-type'] || '';
-
-    // Errors come back as JSON
-    if (res.status >= 400 || type.includes('application/json')) {
-        let msg = `HTTP ${res.status}`;
-        try { msg = JSON.parse(buf.toString('utf-8')).error || msg; } catch {}
-        if (res.status === 401) msg = 'API key invalid or expired';
-        if (res.status === 429) msg = 'Daily API limit reached';
-        throw new Error(msg);
-    }
-
-    if (buf.length < 5000) throw new Error(`Audio too small (${buf.length} bytes)`);
-
-    const dec = (h) => { try { return decodeURIComponent(res.headers[h] || ''); } catch { return ''; } };
-    const ext = (res.headers['x-audio-ext'] || 'm4a').toLowerCase();
-
-    return {
-        buf,
-        title:     dec('x-title') || 'song',
-        uploader:  dec('x-uploader'),
-        thumbnail: res.headers['x-thumbnail'] || null,
-        mimetype:  ext === 'mp3' ? 'audio/mpeg' : (ext === 'webm' || ext === 'opus') ? 'audio/ogg; codecs=opus' : 'audio/mp4',
-        ext,
-    };
+  }
+  throw new Error('ytplay failed to return valid audio');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// MAIN EXECUTE
-// ═══════════════════════════════════════════════════════════════
-
-async function execute(sock, msg, botData, args) {
-    const chatId = msg.key.remoteJid;
-    if (!chatId) return null;
-
-    if (!args || args.length === 0) {
-        return `*🎵 SONG DOWNLOADER*\n\n*.song <name or link>* — Download YouTube audio\n\n*Aliases:* .play  .ytmp3  .music`;
+async function fetchAudioFromSpotify(query) {
+  const res = await axios.get(`https://api.nexray.eu.cc/downloader/spotifyplay?q=${encodeURIComponent(query)}`, {
+    timeout: 30000,
+    headers: { 'User-Agent': 'Mozilla/5.0' }
+  });
+  if (res.data?.status && res.data?.result?.download_url) {
+    const r = res.data.result;
+    const dl = await axios.get(r.download_url, {
+      responseType: 'arraybuffer',
+      timeout: 60000,
+      maxContentLength: 100 * 1024 * 1024
+    });
+    if (dl.data && dl.data.length > 5000) {
+      return {
+        buffer: Buffer.from(dl.data),
+        title: `${r.artist ? r.artist + ' - ' : ''}${r.title || query}`,
+        duration: r.duration || '',
+        thumbnail: r.thumbnail || '',
+        channel: r.artist || ''
+      };
     }
+  }
+  throw new Error('Spotify downloader failed');
+}
 
-    const query = args.join(' ').trim();
+async function execute(sock, msg, args, extra) {
+  const chatId = extra?.from || msg.key?.remoteJid;
+  if (!chatId) return;
 
-    try { await sock.sendPresenceUpdate('recording', chatId); } catch {}
-    try { await sock.sendMessage(chatId, { react: { text: '⬇️', key: msg.key } }); } catch {}
+  let query = args && args.length ? args.join(' ').trim() : '';
+  if (!query) {
+    const quoted = extra?.quoted;
+    query = quoted?.conversation || quoted?.extendedTextMessage?.text || '';
+  }
 
-    let song;
+  if (!query) {
+    const prefix = config.prefix || '.';
+    return extra?.reply ? extra.reply(
+      `🎵 *MUSIC & SONG DOWNLOADER*\n\n` +
+      `*Usage:*\n` +
+      `• \`${prefix}play <song name or link>\`\n` +
+      `• \`${prefix}song <song name or link>\`\n` +
+      `• \`${prefix}music <song name>\`\n\n` +
+      `*Examples:*\n` +
+      `• \`${prefix}play Alan Walker Faded\`\n` +
+      `• \`${prefix}play https://youtu.be/60ItHLz5WEA\``
+    ) : null;
+  }
+
+  try {
+    await sock.sendPresenceUpdate('recording', chatId);
+  } catch {}
+
+  try {
+    await sock.sendMessage(chatId, { react: { text: '🎵', key: msg.key } });
+  } catch {}
+
+  let audioResult = null;
+  let lastError = null;
+
+  // Attempt 1: YTPlay Downloader
+  try {
+    audioResult = await fetchAudioFromYtPlay(query);
+  } catch (err) {
+    lastError = err;
+    console.warn('[PLAY] YTPlay failed, trying Spotify fallback...', err.message);
+  }
+
+  // Attempt 2: Spotify Downloader Fallback
+  if (!audioResult) {
     try {
-        song = await fetchSong(query);
-        console.log(`[SONG] ✓ ${song.title.substring(0, 40)} (${(song.buf.length / 1024).toFixed(0)} KB)`);
+      audioResult = await fetchAudioFromSpotify(query);
     } catch (err) {
-        console.error('[SONG] Error:', err.message);
-        try { await sock.sendMessage(chatId, { react: { text: '❌', key: msg.key } }); } catch {}
-        return `❌ *Could not get that song*\n\n_${err.message}_`;
+      lastError = err;
+      console.warn('[PLAY] Spotify fallback failed...', err.message);
     }
+  }
 
-    const safeTitle = song.title.replace(/[^\w\s\-()']/g, '').trim() || 'song';
+  // Attempt 3: Search YouTube title first then retry
+  if (!audioResult) {
+    try {
+      const search = await yts(query);
+      const firstVid = search?.videos?.[0];
+      if (firstVid?.title) {
+        audioResult = await fetchAudioFromYtPlay(firstVid.title);
+      }
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  if (!audioResult || !audioResult.buffer) {
+    try {
+      await sock.sendMessage(chatId, { react: { text: '❌', key: msg.key } });
+    } catch {}
+    return extra?.reply ? extra.reply(`❌ *Could not download audio for:* _${query}_\n\nReason: ${lastError?.message || 'Download services currently unavailable'}`) : null;
+  }
+
+  const safeTitle = (audioResult.title || 'song').replace(/[<>:"/\\|?*]/g, '').trim().slice(0, 80) || 'song';
+
+  try {
+    await sock.sendMessage(chatId, {
+      audio: audioResult.buffer,
+      mimetype: 'audio/mpeg',
+      fileName: `${safeTitle}.mp3`,
+      ptt: false
+    }, { quoted: msg });
 
     try {
-        await sock.sendMessage(chatId, {
-            audio: song.buf,
-            mimetype: song.mimetype,
-            fileName: `${safeTitle}.${song.ext}`,
-            ptt: false,
-        }, { quoted: msg });
-
-        try { await sock.sendMessage(chatId, { react: { text: '✅', key: msg.key } }); } catch {}
-        return null;
-    } catch (err) {
-        console.error('[SONG] Send Error:', err.message);
-        try { await sock.sendMessage(chatId, { react: { text: '❌', key: msg.key } }); } catch {}
-        return `❌ *Failed to send audio*\n\n_${err.message}_`;
+      await sock.sendMessage(chatId, { react: { text: '✅', key: msg.key } });
+    } catch {}
+  } catch (err) {
+    console.error('[PLAY] Send Error:', err.message);
+    try {
+      await sock.sendMessage(chatId, { react: { text: '❌', key: msg.key } });
+    } catch {}
+    if (extra?.reply) {
+      await extra.reply(`❌ *Failed to send audio:* ${err.message}`);
     }
+  }
 }
 
 module.exports = {
-    name:     'song',
-    aliases:  ['play', 'ytmp3', 'music'],
-    desc:     'Download song from YouTube (OxBot API)',
-    category: 'downloader',
-    execute,
+  name: 'play',
+  aliases: ['song', 'music', 'ytmp3', 'yta', 'audio'],
+  category: 'media',
+  description: 'Play and download music/songs from YouTube or Spotify',
+  usage: '.play <song name or URL>',
+  execute
 };

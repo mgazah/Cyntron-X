@@ -192,7 +192,7 @@ module.exports = {
       const plink = config.social?.github || 'https://github.com';
       const chatId = extra.from;
       const fullMenu = applyFont(menulist + `\n> ${config.botName}`);
-      const supreme = `Powered by ${ownername}`;
+      const footerText = `Powered by ${ownername}`;
       if (menustyle === '1') {
         await sock.sendMessage(chatId, {
           document: {
@@ -223,7 +223,7 @@ module.exports = {
         const repoUrl = config.social?.github || 'https://github.com';
         await sendButtons(sock, chatId, {
           text: fullMenu,
-          footer: supreme,
+          footer: footerText,
           mentions: [extra.sender],
           buttons: [{
             name: 'cta_url',
@@ -246,7 +246,7 @@ module.exports = {
             mimetype: 'image/jpeg'
           } : undefined,
           text: fullMenu,
-          footer: supreme,
+          footer: footerText,
           mentions: [extra.sender],
           contextInfo: {
             externalAdReply: {
