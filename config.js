@@ -3,7 +3,7 @@ module.exports = {
   ownerName: ['UNSTOPPABLE'],
   botName: 'Cyntron-X',
   prefix: '.',
-  version: '2.9.0',
+  version: '1.0.0',
   sessionName: '',
   sessionID: process.env.SESSION_ID || '',
   newsletterJid: '',
@@ -86,6 +86,6 @@ module.exports = {
   social: {
     github: 'https://github.com/mgazah/Cyntron-X',
     instagram: 'https://instagram.com/activator_negative',
-    youtube: 'http://youtube.com/@suprem_e_lord'
+    youtube: 'http://youtube.com mgazah
   }
 };
