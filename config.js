@@ -86,6 +86,6 @@ module.exports = {
   social: {
     github: 'https://github.com/mgazah/Cyntron-X',
     instagram: 'https://instagram.com/activator_negative',
-    youtube: 'http://youtube.com mgazah
+    youtube: 'http://youtube.com mgazah'
   }
 };
